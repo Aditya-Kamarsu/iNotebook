@@ -1,58 +1,119 @@
 import NoteContext from "./noteContext";
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
 const NoteState = (props) => {
+  const host = "http://localhost:5000";
   const notesinitial = [
-    {
-      "_id": "61a86f708873e1358618cc45",
-      "user": "61a74482f8f3fe71099367b3",
-      "title": "Remainder",
-      "description": "Wake up at 6",
-      "tag": "personal",
-      "date": "2021-12-02T07:02:08.449Z",
-      "__v": 0
-    },
-    {
-      "_id": "61a870863c0790390bfaa0c6",
-      "user": "61a74482f8f3fe71099367b3",
-      "title": "Lunch - Remainder",
-      "description": "Thinu ra pannendu ayindhi",
-      "tag": "personal",
-      "date": "2021-12-02T07:06:46.912Z",
-      "__v": 0
-    },
-    {
-      "_id": "61a870893c0790390bfaa0c8",
-      "user": "61a74482f8f3fe71099367b3",
-      "title": "Lunch - Remainder",
-      "description": "Thinu ra pannendu ayindhi",
-      "tag": "personal",
-      "date": "2021-12-02T07:06:49.051Z",
-      "__v": 0
-    },
-    {
-      "_id": "61a8708a3c0790390bfaa0ca",
-      "user": "61a74482f8f3fe71099367b3",
-      "title": "Lunch - Remainder",
-      "description": "Thinu ra pannendu ayindhi",
-      "tag": "personal",
-      "date": "2021-12-02T07:06:50.465Z",
-      "__v": 0
-    },
-    {
-      "_id": "61a8708c3c0790390bfaa0cc",
-      "user": "61a74482f8f3fe71099367b3",
-      "title": "Lunch - Remainder",
-      "description": "Thinu ra pannendu ayindhi",
-      "tag": "personal",
-      "date": "2021-12-02T07:06:52.136Z",
-      "__v": 0
-    }
-  ]
+    
+  ];
 
   const [notes, setnotes] = useState(notesinitial);
+
+  //get all notes
+
+  const getNotes = async () => {
+    //Api call
+    const url = `${host}/api/notes/fetchallnotes`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFhNzQ0ODJmOGYzZmU3MTA5OTM2N2IzIn0sImlhdCI6MTYzODQyMTAxNn0.0DIdCjYrXR4gnsYT10VrTPp3OF3n1Ldfuw-7eP0pD-U",
+      }
+    });
+    const json = await response.json();
+    console.log(json);
+    setnotes(json);
+  };
+
+  //Add note
+
+  const addNote = async (title, description, tag) => {
+    //Api call
+    const url = `${host}/api/notes/addnote`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFhNzQ0ODJmOGYzZmU3MTA5OTM2N2IzIn0sImlhdCI6MTYzODQyMTAxNn0.0DIdCjYrXR4gnsYT10VrTPp3OF3n1Ldfuw-7eP0pD-U",
+      },
+      body: JSON.stringify({title, description, tag}),
+    });
+    
+
+
+    const note = {
+      _id: "61a86f708873e1358618cc45",
+      user: "61a74482f8f3fe71099367b3",
+      title: title,
+      description: description,
+      tag: tag,
+      date: "2021-12-02T07:02:08.449Z",
+      __v: 0,
+    };
+    const json = response.json();
+    console.log(json);
+    setnotes(notes.concat(note));
+  };
+
+  //Delete note
+
+  const deleteNote = async (id) => {
+    //api call
+    const url = `${host}/api/notes/deletenote/${id}`;
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFhNzQ0ODJmOGYzZmU3MTA5OTM2N2IzIn0sImlhdCI6MTYzODQyMTAxNn0.0DIdCjYrXR4gnsYT10VrTPp3OF3n1Ldfuw-7eP0pD-U",
+      }
+    });
+    const json = response.json();
+    console.log(json);
+
+    const newNotes = notes.filter((note) => {
+      return note._id !== id;
+    });
+    setnotes(newNotes);
+  };
+
+  //Edit note
+
+  const editNote = async (id, title, description, tag) => {
+    //api call
+    const url = `${host}/api/notes/updatenote/${id}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFhNzQ0ODJmOGYzZmU3MTA5OTM2N2IzIn0sImlhdCI6MTYzODQyMTAxNn0.0DIdCjYrXR4gnsYT10VrTPp3OF3n1Ldfuw-7eP0pD-U",
+      },
+      body: JSON.stringify({title, description, tag}),
+    });
+    const json = response.json();
+    console.log(json);
+    //logic
+
+    for (let index = 0; index < notes.length; index++) {
+      const element = notes[index];
+      if (element._id === id) {
+        element.title = title;
+        element.description = description;
+        element.tag = tag;
+      }
+    }
+  };
+
   return (
-    <NoteContext.Provider value={{notes,setnotes}}>{props.children}</NoteContext.Provider>
+    <NoteContext.Provider
+      value={{ notes, addNote, deleteNote, editNote, setnotes, getNotes }}
+    >
+      {props.children}
+    </NoteContext.Provider>
   );
 };
 
